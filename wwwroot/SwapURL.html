@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sewing Dashboard</title>
+    <style>
+        /* Ensure the body takes the full viewport */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Make sure the iframe takes up the full page */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <iframe id="siteFrame"
+            <!--src="http://localhost:5114/Dashboard/GetDashboardData?company=Tropical%20Knitex%20Ltd.&floorName=2nd%20Floor%20Main%20Building">-->
+        src="http://localhost:5114/Dashboard/">
+    </iframe>
+
+    <script>
+        // URLs to switch
+        const urls = ["http://localhost:5114/Dashboard/", "https://103.9.134.216:449/DyeingProduction"];
+        let currentIndex = 0;
+
+        // Function to switch iframe src without blank page
+        function switchIframeSource() {
+            const iframe = document.getElementById("siteFrame");
+            const nextIndex = 1 - currentIndex; // Switch index
+            const nextUrl = urls[nextIndex];
+
+            // Preload next URL by setting it in a hidden iframe (to avoid blank page)
+            const preloadIframe = document.createElement('iframe');
+            preloadIframe.style.display = 'none'; // Hide the preload iframe
+            preloadIframe.src = nextUrl; // Preload the next URL
+            document.body.appendChild(preloadIframe);
+
+            // Switch the iframe src after preload
+            setTimeout(() => {
+                iframe.src = nextUrl;
+                currentIndex = nextIndex;
+                document.body.removeChild(preloadIframe); // Clean up after switching
+            }, 100); // Small delay before changing to the preloaded content
+        }
+
+        // Switch every 10 seconds = 10000 ms
+        setInterval(switchIframeSource, 30000);
+    </script>
+
+</body>
+</html>

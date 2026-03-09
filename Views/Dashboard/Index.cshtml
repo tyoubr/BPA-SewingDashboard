@@ -1,0 +1,278 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Sewing DHU Dashboard</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #0f172a;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        #selectionInfo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #facc15;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .dashboard-card {
+            background: #1e293b;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+            .dashboard-card h2 {
+                font-size: 42px;
+                font-weight: bold;
+                color: #facc15;
+                margin-bottom: 5px;
+            }
+
+            .dashboard-card p {
+                font-size: 16px;
+                font-weight: bold;
+                margin: 0;
+            }
+
+        .chart-box {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            height: 500px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        #filterToggleBtn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        #selectedFloor,
+        .dashboard-card .small-value {
+            font-size: 22px;
+        }
+
+        /* Loading overlay */
+
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- LOADING -->
+    <div id="loadingOverlay">
+        <div class="text-center text-white">
+            <div class="spinner-border text-warning"></div>
+            <div style="font-size:24px;margin-top:10px;">Loading...</div>
+        </div>
+    </div>
+
+
+    <div class="container-fluid">
+
+        <!-- TITLE -->
+        <h1>SEWING DHU DASHBOARD</h1>
+        <div id="refreshTimer" style="
+            position:fixed;
+            top:20px;
+            left:20px;
+            font-size:18px;
+            font-weight:bold;
+            color:#facc15;
+            display:none;">
+            Refresh in: <span id="countdown">02:00</span>
+        </div>
+
+        <!-- COMPANY + FLOOR -->
+        <div id="selectionInfo">
+            Company: <span id="selectedCompany"></span> |
+            Floor: <span id="selectedFloorText"></span>
+        </div>
+
+
+        <!-- CARDS -->
+        <div class="row g-3 mb-4">
+
+            <div class="col">
+                <div class="dashboard-card">
+                    <h2 id="inputQty">0</h2>
+                    <p>Sewing Input</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="dashboard-card">
+                    <h2 id="checkQty">0</h2>
+                    <p>Check Qty</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="dashboard-card">
+                    <h2 id="alterSpotQty">0</h2>
+                    <p>Alter/Spot Qty</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="dashboard-card">
+                    <h2 id="replaceQty">0</h2>
+                    <p>Replace Qty</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="dashboard-card">
+                    <h2 id="rejectQty">0</h2>
+                    <p>Reject Qty</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="dashboard-card">
+                    <h2 id="rejectPoint">0</h2>
+                    <p>Reject Point</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="dashboard-card">
+                    <h2 id="outputQty">0</h2>
+                    <p>Output Qty</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="dashboard-card">
+                    <h2 id="dhu">0</h2>
+                    <p>DHU %</p>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- CHARTS -->
+
+        <div class="row g-4">
+
+            <div class="col-md-8">
+                <div class="chart-box">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="chart-box">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FILTER BUTTON -->
+
+    <button class="btn btn-warning fw-bold"
+            id="filterToggleBtn"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#filterPanel">
+        ☰ Filter
+    </button>
+
+
+    <!-- FILTER PANEL -->
+
+    <div class="offcanvas offcanvas-end text-bg-dark" id="filterPanel">
+
+        <div class="offcanvas-header">
+            <h5>Dashboard Filters</h5>
+            <button class="btn-close btn-close-white"
+                    data-bs-dismiss="offcanvas"></button>
+        </div>
+
+        <div class="offcanvas-body">
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Select Company</label>
+                <select id="companySelect" class="form-select">
+                    <option value="">Select Company</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Select Floor</label>
+                <select id="floorSelect" class="form-select">
+                    <option value="">Select Floor</option>
+                </select>
+            </div>
+
+            <button id="btnLoadDashboard"
+                    class="btn btn-warning w-100 fw-bold">
+                Load Dashboard
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/dashboardTest.js"></script>
+
+    @* //Reload in every minute *@
+   @*  <script>
+    setInterval(function () {
+        location.reload();
+    }, 120000);
+</script> *@
+
+</body>
+</html>

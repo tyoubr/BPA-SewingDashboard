@@ -1,0 +1,33 @@
+﻿@* @page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to Sewing Dashboard</h1>
+</div>
+ *@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auto Switch Website</title>
+</head>
+<body style="margin:0">
+
+    <iframe id="siteFrame"
+            src="https://www.facebook.com"
+            width="100%"
+            height="100%"
+            style="border:none;">
+    </iframe>
+
+    <script>
+        setTimeout(function () {
+            document.getElementById("siteFrame").src = "https://www.youtube.com";
+        }, 300000);
+    </script>
+
+</body>
+</html>

@@ -100,7 +100,8 @@
 
 </head>
 
-<body>
+<body data-companyid="@ViewBag.CompanyId"
+      data-floorid="@ViewBag.FloorId">
 
     <!-- LOADING -->
     <div id="loadingOverlay">
@@ -129,7 +130,8 @@
         <!-- COMPANY + FLOOR -->
         <div id="selectionInfo">
             Company: <span id="selectedCompany"></span> |
-            Floor: <span id="selectedFloorText"></span>
+            Floor: <span id="selectedFloorText"></span> |
+            Date: <span id="selectedDateText"></span>
         </div>
 
 
@@ -251,6 +253,10 @@
                     <option value="">Select Floor</option>
                 </select>
             </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Select Date</label>
+                <input type="date" id="dateSelect" class="form-control" />
+            </div>
 
             <button id="btnLoadDashboard"
                     class="btn btn-warning w-100 fw-bold">
@@ -265,13 +271,52 @@
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/dashboardTest.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="~/js/dBoard.js"></script>
+     @* <script src="~/js/dashboardTest.js"></script> *@
 
     @* //Reload in every minute *@
    @*  <script>
     setInterval(function () {
         location.reload();
     }, 120000);
+</script> *@
+@* <script>
+async function loadDashboard() {
+
+    try {
+        document.getElementById("loadingOverlay").style.display = "flex";
+
+        const companyId = 3;
+        const floorId = 21;
+        const date = new Date().toISOString().split('T')[0];
+
+        const response = await fetch(
+            `/Dashboard/GetDashboardData?companyId=${companyId}&floorId=${floorId}&date=${date}`
+        );
+
+        const data = await response.json();
+
+        console.log(data);
+
+        // ✅ EXAMPLE: bind first row (adjust as per your API)
+        if (data.length > 0) {
+            document.getElementById("dhu").innerText = data[0].value ?? 0;
+            document.getElementById("inputQty").innerText = data[1].value ?? 0;
+            document.getElementById("checkQty").innerText = data[2].value ?? 0;
+            document.getElementById("outputQty").innerText = data[3].value ?? 0;
+            document.getElementById("rejectQty").innerText = data[4].value ?? 0;
+            document.getElementById("alterSpotQty").innerText = data[5].value ?? 0;
+        }
+
+    } catch (err) {
+        console.error(err);
+    } finally {
+        document.getElementById("loadingOverlay").style.display = "none";
+    }
+}
+
+window.addEventListener("load", loadDashboard);
 </script> *@
 
 </body>

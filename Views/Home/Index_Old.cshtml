@@ -1,0 +1,152 @@
+﻿@* <!DOCTYPE html>
+<html>
+<head>
+    <title>Continuous Auto Switch</title>
+</head>
+<body style="margin:0">
+
+    <iframe id="siteFrame"
+            src="http://103.231.177.24:8022/erp/login.php"
+            width="100%"
+            height="100%"
+            style="border:none;">
+    </iframe>
+
+    <script>
+        // URLs to switch
+        const urls = ["http://103.231.177.24:8022/erp/login.php", "https://wikipedia.org"];
+        let currentIndex = 0;
+
+        // Switch every 1 minute = 60000 ms
+        setInterval(function () {
+            // Switch index 0 ↔ 1
+            currentIndex = 1 - currentIndex;
+
+            // Change iframe src
+            document.getElementById("siteFrame").src = urls[currentIndex];
+        }, 10000);
+    </script>
+
+</body>
+</html> *@
+
+
+@* Change after every 10 Sec continously using iframe*@
+@* <!DOCTYPE html>
+<html>
+<head>
+    <title>Sewing Dashboard</title>
+</head>
+<body style="margin:0">
+
+    <iframe id="siteFrame"
+            src="https://103.9.134.216:460/ReportCalling/DHU?reportName=rptFinalDHU"
+            width="100%"
+            height="100%"
+            style="border:none;">
+    </iframe>
+
+    <script>
+        const urls = ["https://103.9.134.216:460/ReportCalling/DHU?reportName=rptFinalDHU", "https://example.com"];
+        let currentIndex = 0;
+        setInterval(function () {
+            currentIndex = 1 - currentIndex;
+            document.getElementById("siteFrame").src = urls[currentIndex];
+        }, 10000);
+    </script>
+
+</body>
+</html> *@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sewing Dashboard</title>
+    <style>
+        /* Ensure the body takes the full viewport */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Make sure the iframe takes up the full page */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <iframe id="siteFrame" 
+            src="https://103.9.134.216:449/DyeingProduction">
+    </iframe>
+
+    <script>
+        // URLs to switch
+        const urls = ["https://103.9.134.216:449/DyeingProduction", "http://180.92.235.190:8022/erp/production/reports/display_board_nrg_new.php"];
+        let currentIndex = 0;
+
+        // Function to switch iframe src without blank page
+        function switchIframeSource() {
+            const iframe = document.getElementById("siteFrame");
+            const nextIndex = 1 - currentIndex; // Switch index
+            const nextUrl = urls[nextIndex];
+            
+            // Preload next URL by setting it in a hidden iframe (to avoid blank page)
+            const preloadIframe = document.createElement('iframe');
+            preloadIframe.style.display = 'none'; // Hide the preload iframe
+            preloadIframe.src = nextUrl; // Preload the next URL
+            document.body.appendChild(preloadIframe);
+
+            // Switch the iframe src after preload
+            setTimeout(() => {
+                iframe.src = nextUrl;
+                currentIndex = nextIndex;
+                document.body.removeChild(preloadIframe); // Clean up after switching
+            }, 100); // Small delay before changing to the preloaded content
+        }
+
+        // Switch every 10 seconds = 10000 ms
+        setInterval(switchIframeSource, 10000);
+    </script>
+
+</body>
+</html>
+
+@* Change after every 10 Sec continously without iframe*@
+@* <!DOCTYPE html>
+<html>
+<head>
+    <title>Continuous Auto Switch</title>
+</head>
+<body>
+
+    <script>
+        const urls = ["https://www.facebook.com", "https://www.youtube.com"];
+        let currentIndex = 0;
+
+        function switchSite() {
+            // Open the next site in the same tab
+            window.location.href = urls[currentIndex];
+
+            // Toggle index
+            currentIndex = 1 - currentIndex;
+        }
+
+        // First switch after 10 sec
+        setTimeout(switchSite, 10000);
+
+        // Then switch every 10 sec after that
+        setInterval(switchSite, 10000);
+
+        // Start by opening the first site
+        window.location.href = urls[currentIndex];
+    </script>
+
+</body>
+</html> *@

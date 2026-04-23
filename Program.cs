@@ -13,6 +13,7 @@ builder.Services.AddControllersWithViews();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
@@ -31,7 +32,7 @@ app.UseRouting();
 // Enable routing
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
 app.UseAuthorization();
 

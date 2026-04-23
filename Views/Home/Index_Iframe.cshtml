@@ -11,7 +11,6 @@
         padding: 0;
         height: 100%;
         width: 100%;
-        overflow: hidden;
     }
 
     iframe {
@@ -27,18 +26,23 @@
 <iframe id="siteFrame"></iframe>
 
 <script>
+window.alert = function () { };
+
 // =====================
 // STATE
 // =====================
 let isAbc = true;
 
+let companyId = null;
+let floorId = null;
+
 // =====================
-// PARAMS
+// URL PARAMS
 // =====================
 const params = new URLSearchParams(window.location.search);
 
-const companyId = params.get("companyId") || "@ViewBag.CompanyId";
-const floorId = params.get("floorId") || "@ViewBag.FloorId";
+companyId = params.get("companyId") || "@ViewBag.CompanyId";
+floorId = params.get("floorId") || "@ViewBag.FloorId";
 
 // =====================
 // DATE
@@ -49,46 +53,48 @@ function getCurrentDate() {
 }
 
 // =====================
-// URLS
+// CACHE SAFE URLS
 // =====================
-
-// 🔵 PROXY (PHP via backend)
 function getAbcUrl() {
-    return `/Home/Proxy?companyId=${companyId}`
-        + `&floorId=${floorId}`
-        + `&date=${getCurrentDate()}`
-        + `&t=${Date.now()}`;
+    return "http://180.92.235.190:8022/erp/production/reports/display_board_nrg_new.php"
+        + "?action=report_generate"
+        + "&cbo_company_name=" + companyId
+        + "&txt_date=" + getCurrentDate()
+        + "&cbo_floor_id=" + floorId
+        + "&page_width=1536"
+        + "&page_height=864"
+        + "&t=" + Date.now();
 }
-
-// 🟢 LOCAL DASHBOARD
+z
 function getXyzUrl() {
-    return `/Dashboard/Index`
-        + `?companyId=${companyId}`
-        + `&floorId=${floorId}`
-        + `&date=${getCurrentDate()}`
-        + `&t=${Date.now()}`;
+    return "https://localhost:44347/Dashboard/Index"
+        + "?companyId=" + companyId
+        + "&floorId=" + floorId
+        + "&date=" + getCurrentDate()
+        + "&t=" + Date.now();
 }
 
 // =====================
-// LOAD IFRAME
+// FORCE FULL RESET LOAD
 // =====================
 function loadIframe(url) {
     const iframe = document.getElementById("siteFrame");
 
-    // prevent unnecessary reload
-    if (iframe.src === url) return;
+    // 🔥 HARD RESET (IMPORTANT FIX)
+    iframe.src = "about:blank";
 
-    iframe.src = url;
+    setTimeout(() => {
+        iframe.src = url;
+    }, 50);
 }
 
 // =====================
 // SWITCH
 // =====================
 function switchIframeSource() {
-
     const url = isAbc ? getAbcUrl() : getXyzUrl();
 
-    console.log("Loading:", url);
+    console.log("Loading iframe:", url);
 
     loadIframe(url);
 
@@ -100,10 +106,12 @@ function switchIframeSource() {
 // =====================
 switchIframeSource();
 
-// 🔁 switch every 2 minutes
-setInterval(switchIframeSource, 120000);
+// 1 minute refresh
+setInterval(switchIframeSource, 60000);
 
 </script>
 
 </body>
 </html>
+
+

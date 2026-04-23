@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard Loader</title>
+<script>
+function getTodayDate(){
+    const d = new Date();
+    return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+}
+
+function submitDashboard(){
+    const company = localStorage.getItem("company") || prompt("Enter Company ID:");
+    const floor = localStorage.getItem("floor") || prompt("Enter Floor ID:");
+
+    localStorage.setItem("company", company);
+    localStorage.setItem("floor", floor);
+
+    document.getElementById("cbo_company_name").value = company;
+    document.getElementById("cbo_floor_id").value = floor;
+    document.getElementById("txt_date").value = getTodayDate();
+    document.getElementById("hidden_line_id").value = "";
+    document.getElementById("page_width").value = window.innerWidth;
+    document.getElementById("page_height").value = window.innerHeight;
+
+    document.getElementById("boardForm").submit();
+}
+
+function changeParams(){
+    localStorage.clear();
+    submitDashboard();
+}
+
+// submit after DOM is fully loaded
+window.addEventListener("DOMContentLoaded", function(){
+    submitDashboard();
+    setInterval(submitDashboard, 60000); // resubmit every 60 seconds
+});
+</script>
+</head>
+<body style="margin:0">
+
+<button onclick="changeParams()" style="position:fixed;top:10px;right:10px;z-index:9999;">
+Change Company/Floor
+</button>
+
+<form id="boardForm" method="POST" target="boardFrame" 
+      action="http://180.92.235.190:8022/erp/production/reports/display_board_nrg_new.php">
+<input type="hidden" name="action" value="report_generate">
+<input type="hidden" name="cbo_company_name" id="cbo_company_name">
+<input type="hidden" name="cbo_floor_id" id="cbo_floor_id">
+<input type="hidden" name="txt_date" id="txt_date">
+<input type="hidden" name="hidden_line_id" id="hidden_line_id">
+<input type="hidden" name="page_width" id="page_width">
+<input type="hidden" name="page_height" id="page_height">
+</form>
+
+<iframe name="boardFrame" style="width:100%;height:100vh;border:none;"></iframe>
+</body>
+</html>

@@ -13,70 +13,87 @@ namespace SewingDashboard.Controllers
         {
             _configuration = configuration;
         }
+        private DateTime GetSafeDate(string date)
+        {
+            if (string.IsNullOrWhiteSpace(date))
+                return DateTime.Today;
+
+            if (DateTime.TryParse(date, out var parsed))
+                return parsed;
+
+            return DateTime.Today;
+        }
 
         // ✅ Loads the dashboard page
-        public IActionResult Index()
+        //public IActionResult Index()
+        //{
+        //    return View();
+        //}
+        public IActionResult Index(int companyId, int floorId)
         {
+            ViewBag.CompanyId = companyId;
+            ViewBag.FloorId = floorId;
+
             return View();
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetCompanyList()
-        {
-            var companyList = new List<string>();
+        //[HttpGet]
+        //public async Task<IActionResult> GetCompanyList()
+        //{
+        //    var companyList = new List<string>();
 
-            string? connectionString = _configuration.GetConnectionString("DefaultConnection");
+        //    string? connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            if (string.IsNullOrEmpty(connectionString))
-                return BadRequest("Connection string not found.");
+        //    if (string.IsNullOrEmpty(connectionString))
+        //        return BadRequest("Connection string not found.");
 
-            await using SqlConnection con = new SqlConnection(connectionString);
-            await using SqlCommand cmd = new SqlCommand("COMPANY", con);
+        //    await using SqlConnection con = new SqlConnection(connectionString);
+        //    await using SqlCommand cmd = new SqlCommand("COMPANY", con);
 
-            cmd.CommandType = CommandType.StoredProcedure;
+        //    cmd.CommandType = CommandType.StoredProcedure;
 
-            await con.OpenAsync();
-            await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+        //    await con.OpenAsync();
+        //    await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
-            while (await reader.ReadAsync())
-            {
-                if (reader["COMPANY_NAME"] != DBNull.Value)
-                {
-                    companyList.Add(reader["COMPANY_NAME"].ToString()!);
-                }
-            }
+        //    while (await reader.ReadAsync())
+        //    {
+        //        if (reader["ID"] != DBNull.Value)
+        //        {
+        //            companyList.Add(reader["ID"].ToString()!);
+        //        }
+        //    }
 
-            return Json(companyList);
-        }
+        //    return Json(companyList);
+        //}
 
-        [HttpGet]
-        public async Task<IActionResult> GetFloorList()
-        {
-            var floorList = new List<string>();
+        //[HttpGet]
+        //public async Task<IActionResult> GetFloorList()
+        //{
+        //    var floorList = new List<string>();
 
-            string? connectionString = _configuration.GetConnectionString("DefaultConnection");
+        //    string? connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            if (string.IsNullOrEmpty(connectionString))
-                return BadRequest("Connection string not found.");
+        //    if (string.IsNullOrEmpty(connectionString))
+        //        return BadRequest("Connection string not found.");
 
-            await using SqlConnection con = new SqlConnection(connectionString);
-            await using SqlCommand cmd = new SqlCommand("COM_FLOOR_LINE", con);
+        //    await using SqlConnection con = new SqlConnection(connectionString);
+        //    await using SqlCommand cmd = new SqlCommand("COM_FLOOR_LINE", con);
 
-            cmd.CommandType = CommandType.StoredProcedure;
+        //    cmd.CommandType = CommandType.StoredProcedure;
 
-            await con.OpenAsync();
-            await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+        //    await con.OpenAsync();
+        //    await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
-            while (await reader.ReadAsync())
-            {
-                if (reader["FLOOR"] != DBNull.Value)
-                {
-                    floorList.Add(reader["FLOOR"].ToString()!);
-                }
-            }
+        //    while (await reader.ReadAsync())
+        //    {
+        //        if (reader["FLOOR_ID"] != DBNull.Value)
+        //        {
+        //            floorList.Add(reader["FLOOR_ID"].ToString()!);
+        //        }
+        //    }
 
-            return Json(floorList);
-        }
+        //    return Json(floorList);
+        //}
 
         //[HttpGet]
         //public async Task<IActionResult> GetDashboardCardData()
@@ -115,93 +132,195 @@ namespace SewingDashboard.Controllers
 
         //}
 
-        // ✅ Returns dashboard data as JSON
         [HttpGet]
-        public async Task<IActionResult> GetDashboardData(string company, string floorName)
+        public async Task<IActionResult> GetCompanyList()
         {
-            var lineWise = new List<LineWiseDto>();
+            var companyList = new List<CompanyDto>();
 
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            if (string.IsNullOrEmpty(connectionString))
+            if (string.IsNullOrWhiteSpace(connectionString))
                 return BadRequest("Connection string not found.");
 
-            await using SqlConnection con = new SqlConnection(connectionString);
-            await using SqlCommand cmd = new SqlCommand("rptSewingDHU", con);
-
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            cmd.Parameters.Add("@Company", SqlDbType.NVarChar, 200).Value = company;
-            cmd.Parameters.Add("@Floor", SqlDbType.NVarChar, 200).Value = floorName;
+            await using var con = new SqlConnection(connectionString);
+            await using var cmd = new SqlCommand("COMPANY", con)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
 
             await con.OpenAsync();
 
-            await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+            await using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
-                lineWise.Add(new LineWiseDto
+                companyList.Add(new CompanyDto
                 {
-                    Name = reader["LINE_NAME"]?.ToString(),
-                    Value = reader["DHU"] != DBNull.Value
-                                ? Convert.ToDecimal(reader["DHU"])
-                                : 0
+                    Id = reader["ID"] == DBNull.Value
+                            ? 0
+                            : Convert.ToInt32(reader["ID"]),
+
+                    Name = reader["COMPANY_NAME"]?.ToString()
                 });
             }
-            // For now, just reuse lineWise as defects for pie chart
-            //var defects = lineWise.Select(l => new { l.Name, Value = (int)l.Value }).ToList();
 
-
-            return Json(lineWise);
-            //return Json(new { count = lineWise.Count, data = lineWise });
-            /*return Json(new { lineWise, defects });*/ // ✅ return both datasets
-
+            return Ok(companyList);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetDashboardCardData(string company, string floorName)
+        public async Task<IActionResult> GetFloorList(int companyId)
         {
-            var floorWiseData = new List<FloorWiseDTO>();
+            var floorList = new List<FloorDto>();
 
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            if (string.IsNullOrEmpty(connectionString))
+            if (string.IsNullOrWhiteSpace(connectionString))
                 return BadRequest("Connection string not found.");
 
-            await using SqlConnection con = new SqlConnection(connectionString);
-            await using SqlCommand cmd = new SqlCommand("Tst_rptSewingDHU_FLOOR", con);
+            await using var con = new SqlConnection(connectionString);
+            await using var cmd = new SqlCommand("COM_FLOOR", con)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
 
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            cmd.Parameters.Add("@Company", SqlDbType.NVarChar, 200).Value = company;
-            cmd.Parameters.Add("@Floor", SqlDbType.NVarChar, 200).Value = floorName;
+            // 🔥 ADD PARAMETER
+            cmd.Parameters.Add("@COMPANY_ID", SqlDbType.Int).Value = companyId;
 
             await con.OpenAsync();
 
-            await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+            await using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                floorList.Add(new FloorDto
+                {
+                    Id = reader["FLOOR_ID"] == DBNull.Value
+                        ? 0
+                        : Convert.ToInt32(reader["FLOOR_ID"]),
+
+                    Name = reader["FLOOR"]?.ToString()
+                });
+            }
+
+            return Ok(floorList);
+        }
+
+        //[HttpGet]
+        //public async Task<IActionResult> GetFloorList()
+        //{
+        //    var floorList = new List<FloorDto>();
+
+        //    var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+        //    if (string.IsNullOrWhiteSpace(connectionString))
+        //        return BadRequest("Connection string not found.");
+
+        //    await using var con = new SqlConnection(connectionString);
+        //    await using var cmd = new SqlCommand("COM_FLOOR", con)
+        //    {
+        //        CommandType = CommandType.StoredProcedure
+        //    };
+
+        //    await con.OpenAsync();
+
+        //    await using var reader = await cmd.ExecuteReaderAsync();
+
+        //    while (await reader.ReadAsync())
+        //    {
+        //        floorList.Add(new FloorDto
+        //        {
+        //            Id = reader["FLOOR_ID"] == DBNull.Value
+        //                    ? 0
+        //                    : Convert.ToInt32(reader["FLOOR_ID"]),
+
+        //            Name = reader["FLOOR"]?.ToString()
+        //        });
+        //    }
+
+        //    return Ok(floorList);
+        //}
+
+        // ✅ Returns dashboard data as JSON
+        [HttpGet]
+        public async Task<IActionResult> GetDashboardData(int companyId, int floorId, string date)
+        {
+            var list = new List<LineWiseDto>();
+
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+                return BadRequest("Connection string not found.");
+
+            var parsedDate = GetSafeDate(date);
+
+            await using var con = new SqlConnection(connectionString);
+            await using var cmd = new SqlCommand("test_rptSewingDHU", con)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            cmd.Parameters.Add("@CompanyId", SqlDbType.Int).Value = companyId;
+            cmd.Parameters.Add("@FloorId", SqlDbType.Int).Value = floorId;
+            cmd.Parameters.Add("@Date", SqlDbType.Date).Value = parsedDate;
+
+            await con.OpenAsync();
+
+            await using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                list.Add(new LineWiseDto
+                {
+                    Name = reader["LINE_NAME"]?.ToString(),
+                    Value = Convert.ToDecimal(reader["DHU"] ?? 0)
+                });
+            }
+
+            return Ok(list);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDashboardCardData(int companyId, int floorId, string date)
+        {
+            var floorWiseData = new List<FloorWiseDTO>();
+
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+                return BadRequest("Connection string not found.");
+
+            var parsedDate = GetSafeDate(date);
+
+            await using var con = new SqlConnection(connectionString);
+            await using var cmd = new SqlCommand("Tst_rptSewingDHU_FLOOR", con)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            cmd.Parameters.Add("@CompanyId", SqlDbType.Int).Value = companyId;
+            cmd.Parameters.Add("@FloorId", SqlDbType.Int).Value = floorId;
+            cmd.Parameters.Add("@Date", SqlDbType.Date).Value = parsedDate;
+
+            await con.OpenAsync();
+
+            await using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
                 floorWiseData.Add(new FloorWiseDTO
                 {
-                    INPUT_QTY = reader["INPUT_QTY"] != DBNull.Value ? Convert.ToDecimal(reader["INPUT_QTY"]) : 0,
-                    CHECK_QTY = reader["CHECK_QTY"] != DBNull.Value ? Convert.ToDecimal(reader["CHECK_QTY"]) : 0,
-                    OUTPUT_QTY = reader["OUTPUT_QTY"] != DBNull.Value ? Convert.ToDecimal(reader["OUTPUT_QTY"]) : 0,
-                    ALTER_SPOT_QNTY = reader["ALTER_SPOT_QNTY"] != DBNull.Value ? Convert.ToDecimal(reader["ALTER_SPOT_QNTY"]) : 0,
-                    REPLACE_QTY = reader["REPLACE_QTY"] != DBNull.Value ? Convert.ToDecimal(reader["REPLACE_QTY"]) : 0,
-                    REJECT_QNTY = reader["REJECT_QNTY"] != DBNull.Value ? Convert.ToDecimal(reader["REJECT_QNTY"]) : 0,
-                    REJECT_POINT = reader["REJECT_POINT"] != DBNull.Value ? Convert.ToDecimal(reader["REJECT_POINT"]) : 0,
-                    DHU = reader["DHU"] != DBNull.Value ? Convert.ToDecimal(reader["DHU"]) : 0
+                    INPUT_QTY = Convert.ToDecimal(reader["INPUT_QTY"] ?? 0),
+                    CHECK_QTY = Convert.ToDecimal(reader["CHECK_QTY"] ?? 0),
+                    OUTPUT_QTY = Convert.ToDecimal(reader["OUTPUT_QTY"] ?? 0),
+                    ALTER_SPOT_QNTY = Convert.ToDecimal(reader["ALTER_SPOT_QNTY"] ?? 0),
+                    REPLACE_QTY = Convert.ToDecimal(reader["REPLACE_QTY"] ?? 0),
+                    REJECT_QNTY = Convert.ToDecimal(reader["REJECT_QNTY"] ?? 0),
+                    REJECT_POINT = Convert.ToDecimal(reader["REJECT_POINT"] ?? 0),
+                    DHU = Convert.ToDecimal(reader["DHU"] ?? 0)
                 });
             }
-            // For now, just reuse lineWise as defects for pie chart
-            //var defects = lineWise.Select(l => new { l.Name, Value = (int)l.Value }).ToList();
 
-
-            return Json(floorWiseData);
-            //return Json(new { count = floorWiseData.Count, data = floorWiseData });
-            /*return Json(new { lineWise, defects });*/ // ✅ return both datasets
-
+            return Ok(floorWiseData);
         }
 
         [HttpGet]
@@ -239,42 +358,82 @@ namespace SewingDashboard.Controllers
             return Json(floorWiseDHU);
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> GetPieChartData(int companyId, int floorId, string date)
+        //{
+        //    var DefectList = new List<DefectDTO>();
+
+        //    string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+        //    if (string.IsNullOrEmpty(connectionString))
+        //        return BadRequest("Connection string not found.");
+
+        //    await using SqlConnection con = new SqlConnection(connectionString);
+        //    await using SqlCommand cmd = new SqlCommand("Tst_top5Defect", con);
+
+        //    cmd.CommandType = CommandType.StoredProcedure;
+
+        //    // ✅ Set timeout to 4 minutes
+        //    cmd.CommandTimeout = 240;
+
+        //    cmd.Parameters.Add("@CompanyId", SqlDbType.Int).Value = companyId;
+        //    cmd.Parameters.Add("@FloorId", SqlDbType.Int).Value = floorId;
+        //    cmd.Parameters.Add("@Date", SqlDbType.Date).Value = parsedDate;
+
+        //    await con.OpenAsync();
+
+        //    await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+        //    while (await reader.ReadAsync())
+        //    {
+        //        DefectList.Add(new DefectDTO
+        //        {
+        //            Name = reader["DEFECT_NAME"]?.ToString(),
+        //            Value = reader["DEFECT_QTY"] != DBNull.Value
+        //                        ? Convert.ToDecimal(reader["DEFECT_QTY"])
+        //                        : 0
+        //        });
+        //    }
+        //    return Json(DefectList);
+        //}
+
         [HttpGet]
-        public async Task<IActionResult> GetPieChartData(string company, string floorName)
+        public async Task<IActionResult> GetPieChartData(int companyId, int floorId, string date)
         {
-            var DefectList = new List<DefectDTO>();
+            var list = new List<DefectDTO>();
 
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            if (string.IsNullOrEmpty(connectionString))
+            if (string.IsNullOrWhiteSpace(connectionString))
                 return BadRequest("Connection string not found.");
 
-            await using SqlConnection con = new SqlConnection(connectionString);
-            await using SqlCommand cmd = new SqlCommand("Tst_top5Defect", con);
+            var parsedDate = GetSafeDate(date);
 
-            cmd.CommandType = CommandType.StoredProcedure;
+            await using var con = new SqlConnection(connectionString);
+            await using var cmd = new SqlCommand("Tst_top5Defect", con)
+            {
+                CommandType = CommandType.StoredProcedure,
+                CommandTimeout = 240
+            };
 
-            // ✅ Set timeout to 4 minutes
-            cmd.CommandTimeout = 240;
-
-            cmd.Parameters.Add("@Company", SqlDbType.NVarChar, 200).Value = company;
-            cmd.Parameters.Add("@Floor", SqlDbType.NVarChar, 200).Value = floorName;
+            cmd.Parameters.Add("@CompanyId", SqlDbType.Int).Value = companyId;
+            cmd.Parameters.Add("@FloorId", SqlDbType.Int).Value = floorId;
+            cmd.Parameters.Add("@Date", SqlDbType.Date).Value = parsedDate;
 
             await con.OpenAsync();
 
-            await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+            await using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
-                DefectList.Add(new DefectDTO
+                list.Add(new DefectDTO
                 {
                     Name = reader["DEFECT_NAME"]?.ToString(),
-                    Value = reader["DEFECT_QTY"] != DBNull.Value
-                                ? Convert.ToDecimal(reader["DEFECT_QTY"])
-                                : 0
+                    Value = Convert.ToDecimal(reader["DEFECT_QTY"] ?? 0)
                 });
             }
-            return Json(DefectList);
+
+            return Ok(list);
         }
 
 
@@ -318,6 +477,17 @@ public class LineWiseDto
 {
     public string? Name { get; set; }
     public decimal Value { get; set; }
+}
+
+public class FloorDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+}
+public class CompanyDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
 }
 public class FloorWiseDHUDTO
 {

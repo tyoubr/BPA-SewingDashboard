@@ -65,7 +65,6 @@ function getAbcUrl() {
         + "&page_height=864"
         + "&t=" + Date.now();
 }
-z
 function getXyzUrl() {
     return "https://localhost:44347/Dashboard/Index"
         + "?companyId=" + companyId
@@ -85,7 +84,7 @@ function loadIframe(url) {
 
     setTimeout(() => {
         iframe.src = url;
-    }, 50);
+    }, 500);
 }
 
 // =====================

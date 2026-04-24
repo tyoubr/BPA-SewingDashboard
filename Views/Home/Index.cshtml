@@ -12,6 +12,7 @@
         height: 100%;
         width: 100%;
         overflow: hidden;
+        background: black;
     }
 
     iframe {
@@ -27,18 +28,19 @@
 <iframe id="siteFrame"></iframe>
 
 <script>
+
 // =====================
 // STATE
 // =====================
-let isAbc = true;
+let isDashboard = true;
 
 // =====================
 // PARAMS
 // =====================
 const params = new URLSearchParams(window.location.search);
 
-const companyId = params.get("companyId") || "@ViewBag.CompanyId";
-const floorId = params.get("floorId") || "@ViewBag.FloorId";
+const companyId = params.get("companyId") || 3;
+const floorId = params.get("floorId") || 1;
 
 // =====================
 // DATE
@@ -49,59 +51,56 @@ function getCurrentDate() {
 }
 
 // =====================
-// URLS
+// DASHBOARD (LOCAL .NET PAGE)
 // =====================
-
-// 🔵 PROXY (PHP via backend)
-function getAbcUrl() {
-    return `/Home/Proxy?companyId=${companyId}`
-        + `&floorId=${floorId}`
-        + `&date=${getCurrentDate()}`
-        + `&t=${Date.now()}`;
-}
-
-// 🟢 LOCAL DASHBOARD
-function getXyzUrl() {
+function getDashboardUrl() {
     return `/Dashboard/Index`
         + `?companyId=${companyId}`
         + `&floorId=${floorId}`
-        + `&date=${getCurrentDate()}`
         + `&t=${Date.now()}`;
 }
 
 // =====================
-// LOAD IFRAME
+// PHP VIA .NET PROXY (IMPORTANT)
+// =====================
+function getPhpUrl() {
+    return `/Proxy/PhpDashboard`
+        + `?companyId=${companyId}`
+        + `&floorId=${floorId}`
+        + `&t=${Date.now()}`;
+}
+
+// =====================
+// LOAD IFRAME (SAFE)
 // =====================
 function loadIframe(url) {
     const iframe = document.getElementById("siteFrame");
 
-    // prevent unnecessary reload
-    if (iframe.src === url) return;
+    console.log("Loading:", url);
 
     iframe.src = url;
 }
 
 // =====================
-// SWITCH
+// SWITCH LOGIC
 // =====================
-function switchIframeSource() {
-
-    const url = isAbc ? getAbcUrl() : getXyzUrl();
-
-    console.log("Loading:", url);
+function switchDashboard() {
+    const url = isDashboard ? getDashboardUrl() : getPhpUrl();
 
     loadIframe(url);
 
-    isAbc = !isAbc;
+    isDashboard = !isDashboard;
 }
 
 // =====================
 // INIT
 // =====================
-switchIframeSource();
+switchDashboard();
 
-// 🔁 switch every 2 minutes
-setInterval(switchIframeSource, 120000);
+// =====================
+// AUTO ROTATE (2 MIN)
+// =====================
+setInterval(switchDashboard, 120000);
 
 </script>
 

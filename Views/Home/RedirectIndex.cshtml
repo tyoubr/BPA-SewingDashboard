@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TV Dashboard</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Dashboard Running...</h2>
+
+    <script>
+
+        let mode = 0;
+        const companyId = 3;
+        const floorId = 20;
+
+        function loadPage() {
+
+            let url = `/Home/Index?companyId=${companyId}&floorId=${floorId}&mode=${mode}`;
+
+            window.location.href = url;
+
+            mode = (mode === 0) ? 1 : 0;
+        }
+
+        // start loop
+        setTimeout(loadPage, 2000);
+        setInterval(loadPage, 120000);
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>TV Dashboard Debug</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+            background: black;
+            color: white;
+            font-family: Arial;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2 id="status" style="text-align:center;margin-top:20%;">Loading...</h2>
+
+    <script>
+
+        // =====================
+        // CONFIG
+        // =====================
+        const companyId = 3;
+        const floorId = 20;
+
+        // =====================
+        // STATE
+        // =====================
+        let isPhp = true;
+        let counter = 0;
+
+        // =====================
+        // DATE
+        // =====================
+        function getDate() {
+            const d = new Date();
+            return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+        }
+
+        // =====================
+        // LOG FUNCTION (IMPORTANT)
+        // =====================
+        function log(step, msg, url = "") {
+            console.log("==================================");
+            console.log("STEP:", step);
+            console.log("MESSAGE:", msg);
+            console.log("URL:", url);
+            console.log("COUNT:", counter);
+            console.log("TIME:", new Date().toLocaleTimeString());
+            console.log("==================================");
+        }
+
+        // =====================
+        // PHP URL
+        // =====================
+        function phpUrl() {
+            const url =
+                "http://180.92.235.190:8022/erp/production/reports/display_board_nrg_new.php"
+                + "?action=report_generate"
+                + "&cbo_company_name=" + companyId
+                + "&txt_date=" + getDate()
+                + "&cbo_floor_id=" + floorId
+                + "&page_width=1536"
+                + "&page_height=864";
+
+            log("PHP URL GENERATION", "PHP URL created", url);
+            return url;
+        }
+
+        // =====================
+        // .NET URL
+        // =====================
+        function dotnetUrl() {
+            const url = `/Dashboard/Index?companyId=${companyId}&floorId=${floorId}&t=${Date.now()}`;
+
+            log("DOTNET URL GENERATION", ".NET URL created", url);
+            return url;
+        }
+
+        // =====================
+        // SWITCH FUNCTION
+        // =====================
+        function switchPage() {
+
+            counter++;
+
+            log("SWITCH START", isPhp ? "Going to PHP" : "Going to .NET");
+
+            let url = isPhp ? phpUrl() : dotnetUrl();
+
+            document.getElementById("status").innerText =
+                isPhp ? "Loading PHP Dashboard..." : "Loading .NET Dashboard...";
+
+            log("NAVIGATION", "Redirecting now", url);
+
+            // MAIN ACTION
+            window.location.href = url;
+
+            // toggle state
+            isPhp = !isPhp;
+        }
+
+        // =====================
+        // START TRACE
+        // =====================
+        console.log("TV DASHBOARD DEBUG STARTED");
+        console.log("Initial state PHP =", isPhp);
+
+        // =====================
+        // FIRST LOAD
+        // =====================
+        setTimeout(() => {
+            log("INITIAL LOAD", "First trigger after 2 sec");
+            switchPage();
+        }, 2000);
+
+        // =====================
+        // AUTO SWITCH
+        // =====================
+        setInterval(() => {
+            log("INTERVAL TRIGGER", "2 minute cycle triggered");
+            switchPage();
+        }, 60000);
+
+    </script>
+
+</body>
+</html>

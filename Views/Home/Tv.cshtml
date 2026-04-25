@@ -1,0 +1,94 @@
+﻿@{
+    var companyId = ViewBag.CompanyId;
+    var floorId = ViewBag.FloorId;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>TV Dashboard</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: black;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100vh;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <iframe id="frame"></iframe>
+
+    <script>
+        let isPhp = true;
+
+        // =====================
+        // URL BUILDERS
+        // =====================
+        function getPhpUrl() {
+            return "http://180.92.235.190:8022/erp/production/reports/display_board_nrg_new.php"
+                + "?action=report_generate"
+                + "&cbo_company_name=@companyId"
+                + "&txt_date=" + getDate()
+                + "&cbo_floor_id=@floorId"
+                + "&page_width=1536"
+                + "&page_height=864"
+                + "&t=" + Date.now();
+        }
+
+        function getNetUrl() {
+            return "http://103.9.134.216:464/home/index"
+                + "?floorId=@floorId"
+                + "&companyId=@companyId"
+                + "&t=" + Date.now();
+        }
+
+        // =====================
+        // DATE FORMAT
+        // =====================
+        function getDate() {
+            const d = new Date();
+            return String(d.getDate()).padStart(2, '0') + "-"
+                + String(d.getMonth() + 1).padStart(2, '0') + "-"
+                + d.getFullYear();
+        }
+
+        // =====================
+        // LOAD IFRAME
+        // =====================
+        function load() {
+            const frame = document.getElementById("frame");
+
+            const url = isPhp ? getPhpUrl() : getNetUrl();
+
+            console.log("Loading:", url);
+
+            frame.src = url;
+
+            isPhp = !isPhp;
+        }
+
+        // =====================
+        // INIT
+        // =====================
+        load();
+
+        // =====================
+        // SWITCH EVERY 2 MINUTES
+        // =====================
+        setInterval(load, 120000);
+
+    </script>
+
+</body>
+</html>

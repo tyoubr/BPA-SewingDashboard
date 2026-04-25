@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Loop</title>
+</head>
+
+<body style="background:black;color:white;">
+
+    <h2>Loading .NET Dashboard...</h2>
+
+    <script>
+
+        setTimeout(function () {
+
+            // 🔥 THIS IS THE MAGIC LOOP BACK
+            window.location.href =
+                "/Home/Tv?companyId=@Model.companyId&floorId=@Model.floorId&t=" + Date.now();
+
+        }, 120000);
+
+    </script>
+
+</body>
+</html>

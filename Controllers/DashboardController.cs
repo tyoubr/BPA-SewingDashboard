@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
+using System.Globalization;
 
 namespace SewingDashboard.Controllers
 {
@@ -13,26 +14,37 @@ namespace SewingDashboard.Controllers
         {
             _configuration = configuration;
         }
+
         private DateTime GetSafeDate(string date)
-        {
-            if (string.IsNullOrWhiteSpace(date))
-                return DateTime.Today;
-
-            if (DateTime.TryParse(date, out var parsed))
-                return parsed;
-
+    {
+        if (string.IsNullOrWhiteSpace(date))
             return DateTime.Today;
+
+        string[] formats = { "yyyy-MM-dd", "dd-MM-yyyy" };
+
+        if (DateTime.TryParseExact(date, formats,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out var parsed))
+        {
+            return parsed;
         }
 
-        // ✅ Loads the dashboard page
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
-        public IActionResult Index(int companyId, int floorId)
+        return DateTime.Today;
+    }
+
+    // ✅ Loads the dashboard page
+    //public IActionResult Index()
+    //{
+    //    return View();
+    //}
+    public IActionResult Index(int companyId, int floorId, string date)
         {
             ViewBag.CompanyId = companyId;
             ViewBag.FloorId = floorId;
+            ViewBag.Date = string.IsNullOrEmpty(date)
+                ? DateTime.Today.ToString("yyyy-MM-dd")
+                : date;
 
             return View();
         }
@@ -243,6 +255,7 @@ namespace SewingDashboard.Controllers
         // ✅ Returns dashboard data as JSON
         [HttpGet]
         public async Task<IActionResult> GetDashboardData(int companyId, int floorId, string date)
+        
         {
             var list = new List<LineWiseDto>();
 

@@ -12,20 +12,30 @@ const $ = (id) => document.getElementById(id);
 // ================= DATE =================
 function getCurrentDate() {
     const today = new Date();
-    const d = String(today.getDate()).padStart(2, '0');
-    const m = String(today.getMonth() + 1).padStart(2, '0');
-    const y = today.getFullYear();
-    return `${d}-${m}-${y}`;
+
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
 }
 
 // ================= PARAMS (SAFE) =================
+//function getParams() {
+//    const params = new URLSearchParams(window.location.search);
+
+//    return {
+//        companyId: params.get("companyId") || "",
+//        floorId: params.get("floorId") || "",
+//        date: params.get("date") || getCurrentDate()
+//    };
+//}
 function getParams() {
-    const params = new URLSearchParams(window.location.search);
 
     return {
-        companyId: params.get("companyId") || "",
-        floorId: params.get("floorId") || "",
-        date: params.get("date") || getCurrentDate()
+        companyId: document.body.dataset.companyid || "",
+        floorId: document.body.dataset.floorid || "",
+        date: document.body.dataset.date || getCurrentDate()
     };
 }
 
@@ -236,6 +246,7 @@ function renderBarChart(data) {
         plugins: window.ChartDataLabels ? [ChartDataLabels] : [],
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 title: {
                     display: true,
@@ -289,6 +300,7 @@ function renderPieChart(data) {
         plugins: window.ChartDataLabels ? [ChartDataLabels] : [],
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 title: {
                     display: true,
@@ -335,6 +347,17 @@ function hideFilterPanel() {
     document.body.classList.remove("offcanvas-open");
     document.body.style.overflow = "";
 }
+// ================= TV Browser Zoom Issue=================
+function forceFullscreen() {
+    const el = document.documentElement;
+    if (el.requestFullscreen) {
+        el.requestFullscreen();
+    }
+}
+
+window.onload = () => {
+    forceFullscreen();
+};
 
 // ================= INIT =================
 document.addEventListener("DOMContentLoaded", async () => {

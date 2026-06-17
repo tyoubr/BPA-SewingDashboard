@@ -1,0 +1,91 @@
+﻿@model IEnumerable<SewingDashboard.Models.TblOperatorDetail>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Operator Details";
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+
+    int pageSize = 15; // MUST match controller pageSize
+    int sl = (currentPage - 1) * pageSize;
+}
+
+<h2>Operator Details</h2>
+<p class="text-muted">
+    Total Operator Detail: <strong>@ViewBag.TotalOperatorDetailInfo</strong>
+</p>
+<div class="d-flex justify-content-end mb-3">
+    <a href="@Url.Action("Create", "OperatorDetailInfo")" class="btn btn-primary me-2">Create</a>
+    <button type="button" class="btn btn-secondary" onclick="window.history.back();">Back</button>
+</div>
+
+<table class="table mt-3 w-100" style="table-layout: fixed;">
+    <thead>
+        <tr>
+            <th style="width: 5%;">SL</th>
+            <th style="width: 10%;">Prod. Date</th>
+            <th style="width: 15%;">Name</th>
+            <th style="width: 20%;">Process Name</th>
+            <th style="width: 10%;">Avg. Cycle</th>
+            <th style="width: 10%;">Capacity/Hour</th>
+            <th style="width: 20%;">Remarks</th>
+            <th style="width: 10%;" class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            sl++;
+            <tr>
+                <td>@sl</td>
+                <td>@item.ProductionDate?.ToString("dd-MMM-yyyy")</td>
+                <td>@item.Name</td>
+                <td>@item.ProcessName</td>
+                <td>@item.AvgCycle</td>
+                <td>@item.CapacityHr</td>
+                <td>@item.Remark</td>
+                <td class="text-center">
+                    <a href="@Url.Action("Edit", "OperatorDetailInfo", new { id = item.Oid })"
+                       class="btn btn-warning btn-sm me-1">Edit</a>
+                    <a href="@Url.Action("Delete", "OperatorDetailInfo", new { id = item.Oid })"
+                       class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<!-- PAGINATION -->
+<nav aria-label="Employee pagination">
+    <ul class="pagination justify-content-center">
+
+        <!-- Previous -->
+        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+            <a class="page-link"
+               href="@Url.Action("OperatorDetailInfoList", new { page = currentPage - 1 })">
+                Previous
+            </a>
+        </li>
+
+        <!-- Page Numbers -->
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == currentPage ? "active" : "")">
+                <a class="page-link"
+                   href="@Url.Action("OperatorDetailInfoList", new { page = i })">
+                    @i
+                </a>
+            </li>
+        }
+
+        <!-- Next -->
+        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+            <a class="page-link"
+               href="@Url.Action("OperatorDetailInfoList", new { page = currentPage + 1 })">
+                Next
+            </a>
+        </li>
+
+    </ul>
+</nav>

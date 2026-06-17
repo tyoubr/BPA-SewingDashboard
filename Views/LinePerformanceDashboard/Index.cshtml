@@ -16,95 +16,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* .container-fluid {
-        padding-bottom: 50px;
-        }
-        body {
-            background-color: #0f172a;
-            color: white;
-            overflow-x: auto;
-            overflow-y: auto;
-        }
-
-        h3 {
-            text-align: center;
-            margin: 2px 0;
-            font-weight: bold;
-        }
-
-        #selectionInfo {
-            font-size: 14px;
-            font-weight: bold;
-            color: #facc15;
-            text-align: center;
-            margin-bottom: 5px;
-            display: none;
-        }
-
-        .dashboard-card {
-            background: #1e293b;
-            border-radius: 10px;
-            padding: 2px;
-            text-align: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-        }
-
-            .dashboard-card h2 {
-                font-size: 22px;
-                font-weight: bold;
-                color: #facc15;
-                margin-bottom: 5px;
-            }
-
-            .dashboard-card p {
-                font-size: 12px;
-                font-weight: bold;
-                margin: 0;
-            }
-
-        .chart-box {
-            background: white;
-            border-radius: 10px;
-            padding: 2px;
-            height: 450px;
-        }
-
-        canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        #filterToggleBtn {
-        position: fixed;
-        top: 6px;
-        right: 15px;
-        z-index: 1050;
-
-        font-size: 10px;
-        padding: 2px 6px;
-        line-height: 2;
-
-        border-radius: 4px;
-        }
-
-        #selectedFloor,
-        .dashboard-card .small-value {
-            font-size: 18px;
-        }
-
-        #loadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        } */
-
         html {
         font-size: clamp(12px, 1vw, 20px);
         }
@@ -125,11 +36,6 @@
             font-weight: bold;
             font-size: clamp(16px, 2vw, 32px);
         }
-
-        /* INFO TEXT */
-        /* #selectionInfo {
-            font-size: clamp(12px, 1.2vw, 18px);
-        } */
         #selectionInfo {
             font-size: clamp(12px, 1.2vw, 18px);
             font-weight: bold;
@@ -147,17 +53,6 @@
             text-align: center;
             height: 100%;
         }
-
-        /* .dashboard-card h2 {
-            font-size: clamp(16px, 2.5vw, 40px);
-        } */
-        /* .dashboard-card h2 {
-                font-size: clamp(12px, 1.5vw, 5px);
-                font-weight: bold;
-                color: #facc15;
-                margin-bottom: 2px;
-            } */
-
             .dashboard-card h2 {
                 font-size: 30px !important;
                 font-weight: bold;
@@ -202,13 +97,6 @@
         }
 
         /* LOADING */
-        /* #loadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        } */
         #loadingOverlay {
             position: fixed;
             top: 0;
@@ -246,17 +134,7 @@
     <div class="container-fluid">
 
         <!-- TITLE -->
-        <h3>SEWING DHU DASHBOARD</h3>
-       @*  <div id="refreshTimer" style="
-            position:fixed;
-            top:10px;
-            left:20px;
-            font-size:16px;
-            font-weight:bold;
-            color:#facc15;
-            display:none;">
-            Refresh in: <span id="countdown">02:00</span>
-        </div> *@
+        <h3>Line Performance Board</h3>
 
         <!-- COMPANY + FLOOR -->
         <div id="selectionInfo">

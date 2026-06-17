@@ -16,29 +16,24 @@ namespace SewingDashboard.Controllers
         }
 
         private DateTime GetSafeDate(string date)
-    {
-        if (string.IsNullOrWhiteSpace(date))
-            return DateTime.Today;
-
-        string[] formats = { "yyyy-MM-dd", "dd-MM-yyyy" };
-
-        if (DateTime.TryParseExact(date, formats,
-            CultureInfo.InvariantCulture,
-            DateTimeStyles.None,
-            out var parsed))
         {
-            return parsed;
+            if (string.IsNullOrWhiteSpace(date))
+                return DateTime.Today;
+
+            string[] formats = { "yyyy-MM-dd", "dd-MM-yyyy" };
+
+            if (DateTime.TryParseExact(date, formats,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var parsed))
+            {
+                return parsed;
+            }
+
+            return DateTime.Today;
         }
-
-        return DateTime.Today;
-    }
-
-    // ✅ Loads the dashboard page
-    //public IActionResult Index()
-    //{
-    //    return View();
-    //}
-    public IActionResult Index(int companyId, int floorId, string date)
+        [HttpGet]
+        public IActionResult Index(int companyId, int floorId, string date)
         {
             ViewBag.CompanyId = companyId;
             ViewBag.FloorId = floorId;
@@ -48,101 +43,6 @@ namespace SewingDashboard.Controllers
 
             return View();
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> GetCompanyList()
-        //{
-        //    var companyList = new List<string>();
-
-        //    string? connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-        //    if (string.IsNullOrEmpty(connectionString))
-        //        return BadRequest("Connection string not found.");
-
-        //    await using SqlConnection con = new SqlConnection(connectionString);
-        //    await using SqlCommand cmd = new SqlCommand("COMPANY", con);
-
-        //    cmd.CommandType = CommandType.StoredProcedure;
-
-        //    await con.OpenAsync();
-        //    await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-        //    while (await reader.ReadAsync())
-        //    {
-        //        if (reader["ID"] != DBNull.Value)
-        //        {
-        //            companyList.Add(reader["ID"].ToString()!);
-        //        }
-        //    }
-
-        //    return Json(companyList);
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> GetFloorList()
-        //{
-        //    var floorList = new List<string>();
-
-        //    string? connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-        //    if (string.IsNullOrEmpty(connectionString))
-        //        return BadRequest("Connection string not found.");
-
-        //    await using SqlConnection con = new SqlConnection(connectionString);
-        //    await using SqlCommand cmd = new SqlCommand("COM_FLOOR_LINE", con);
-
-        //    cmd.CommandType = CommandType.StoredProcedure;
-
-        //    await con.OpenAsync();
-        //    await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-        //    while (await reader.ReadAsync())
-        //    {
-        //        if (reader["FLOOR_ID"] != DBNull.Value)
-        //        {
-        //            floorList.Add(reader["FLOOR_ID"].ToString()!);
-        //        }
-        //    }
-
-        //    return Json(floorList);
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> GetDashboardCardData()
-        //{
-        //    var floorWiseData = new List<FloorWiseDTO>();
-
-        //    string connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-        //    if (string.IsNullOrEmpty(connectionString))
-        //        return BadRequest("Connection string not found.");
-
-        //    await using SqlConnection con = new SqlConnection(connectionString);
-        //    await using SqlCommand cmd = new SqlCommand("Test_rptSewingDHU_FLOOR", con);
-
-        //    cmd.CommandType = CommandType.StoredProcedure;
-
-        //    await con.OpenAsync();
-
-        //    await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-        //    while (await reader.ReadAsync())
-        //    {
-        //        floorWiseData.Add(new FloorWiseDTO
-        //        {
-        //            INPUT_QTY = reader["INPUT_QTY"] != DBNull.Value ? Convert.ToDecimal(reader["INPUT_QTY"]) : 0,
-        //            CHECK_QTY = reader["CHECK_QTY"] != DBNull.Value ? Convert.ToDecimal(reader["CHECK_QTY"]) : 0,
-        //            OUTPUT_QTY = reader["OUTPUT_QTY"] != DBNull.Value ? Convert.ToDecimal(reader["OUTPUT_QTY"]) : 0,
-        //            ALTER_SPOT_QNTY = reader["ALTER_SPOT_QNTY"] != DBNull.Value ? Convert.ToDecimal(reader["ALTER_SPOT_QNTY"]) : 0,
-        //            REPLACE_QTY = reader["REPLACE_QTY"] != DBNull.Value ? Convert.ToDecimal(reader["REPLACE_QTY"]) : 0,
-        //            REJECT_QNTY = reader["REJECT_QNTY"] != DBNull.Value ? Convert.ToDecimal(reader["REJECT_QNTY"]) : 0,
-        //            REJECT_POINT = reader["REJECT_POINT"] != DBNull.Value ? Convert.ToDecimal(reader["REJECT_POINT"]) : 0,
-        //            DHU = reader["DHU"] != DBNull.Value ? Convert.ToDecimal(reader["DHU"]) : 0
-        //        });
-        //    }
-        //    return Json(floorWiseData);
-
-        //}
 
         [HttpGet]
         public async Task<IActionResult> GetCompanyList()
@@ -217,44 +117,10 @@ namespace SewingDashboard.Controllers
             return Ok(floorList);
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetFloorList()
-        //{
-        //    var floorList = new List<FloorDto>();
-
-        //    var connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-        //    if (string.IsNullOrWhiteSpace(connectionString))
-        //        return BadRequest("Connection string not found.");
-
-        //    await using var con = new SqlConnection(connectionString);
-        //    await using var cmd = new SqlCommand("COM_FLOOR", con)
-        //    {
-        //        CommandType = CommandType.StoredProcedure
-        //    };
-
-        //    await con.OpenAsync();
-
-        //    await using var reader = await cmd.ExecuteReaderAsync();
-
-        //    while (await reader.ReadAsync())
-        //    {
-        //        floorList.Add(new FloorDto
-        //        {
-        //            Id = reader["FLOOR_ID"] == DBNull.Value
-        //                    ? 0
-        //                    : Convert.ToInt32(reader["FLOOR_ID"]),
-
-        //            Name = reader["FLOOR"]?.ToString()
-        //        });
-        //    }
-
-        //    return Ok(floorList);
-        //}
-
-        // ✅ Returns dashboard data as JSON
         [HttpGet]
         public async Task<IActionResult> GetDashboardData(int companyId, int floorId, string date)
+
+        
         
         {
             var list = new List<LineWiseDto>();
@@ -327,7 +193,7 @@ namespace SewingDashboard.Controllers
                     OUTPUT_QTY = Convert.ToDecimal(reader["OUTPUT_QTY"] ?? 0),
                     ALTER_SPOT_QNTY = Convert.ToDecimal(reader["ALTER_SPOT_QNTY"] ?? 0),
                     REPLACE_QTY = Convert.ToDecimal(reader["REPLACE_QTY"] ?? 0),
-                    REJECT_QNTY = Convert.ToDecimal(reader["REJECT_QNTY"] ?? 0),
+                    REJECT_QTY = Convert.ToDecimal(reader["REJECT_QNTY"] ?? 0),
                     REJECT_POINT = Convert.ToDecimal(reader["REJECT_POINT"] ?? 0),
                     DHU = Convert.ToDecimal(reader["DHU"] ?? 0)
                 });
@@ -371,45 +237,6 @@ namespace SewingDashboard.Controllers
             return Json(floorWiseDHU);
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetPieChartData(int companyId, int floorId, string date)
-        //{
-        //    var DefectList = new List<DefectDTO>();
-
-        //    string connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-        //    if (string.IsNullOrEmpty(connectionString))
-        //        return BadRequest("Connection string not found.");
-
-        //    await using SqlConnection con = new SqlConnection(connectionString);
-        //    await using SqlCommand cmd = new SqlCommand("Tst_top5Defect", con);
-
-        //    cmd.CommandType = CommandType.StoredProcedure;
-
-        //    // ✅ Set timeout to 4 minutes
-        //    cmd.CommandTimeout = 240;
-
-        //    cmd.Parameters.Add("@CompanyId", SqlDbType.Int).Value = companyId;
-        //    cmd.Parameters.Add("@FloorId", SqlDbType.Int).Value = floorId;
-        //    cmd.Parameters.Add("@Date", SqlDbType.Date).Value = parsedDate;
-
-        //    await con.OpenAsync();
-
-        //    await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-        //    while (await reader.ReadAsync())
-        //    {
-        //        DefectList.Add(new DefectDTO
-        //        {
-        //            Name = reader["DEFECT_NAME"]?.ToString(),
-        //            Value = reader["DEFECT_QTY"] != DBNull.Value
-        //                        ? Convert.ToDecimal(reader["DEFECT_QTY"])
-        //                        : 0
-        //        });
-        //    }
-        //    return Json(DefectList);
-        //}
-
         [HttpGet]
         public async Task<IActionResult> GetPieChartData(int companyId, int floorId, string date)
         {
@@ -449,37 +276,6 @@ namespace SewingDashboard.Controllers
             return Ok(list);
         }
 
-
-        //[HttpGet]
-        //public async Task<IActionResult> GetPieChartData()
-        //{
-        //    var DefectList = new List<DefectDTO>();
-
-        //    string connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-        //    if (string.IsNullOrEmpty(connectionString))
-        //        return BadRequest("Connection string not found.");
-
-        //    await using SqlConnection con = new SqlConnection(connectionString);
-        //    await using SqlCommand cmd = new SqlCommand("Test_top5Defect", con);
-        //    cmd.CommandType = CommandType.StoredProcedure;
-        //    await con.OpenAsync();
-        //    await using SqlDataReader reader = await cmd.ExecuteReaderAsync();
-
-        //    while (await reader.ReadAsync())
-        //    {
-        //        DefectList.Add(new DefectDTO
-        //        {
-        //            Name = reader["DEFECT_NAME"]?.ToString(),
-        //            Value = reader["DEFECT_QTY"] != DBNull.Value
-        //                        ? Convert.ToDecimal(reader["DEFECT_QTY"])
-        //                        : 0
-        //        });
-        //    }
-
-        //    return Json(DefectList);
-
-        //}
     }
 }
 
@@ -515,7 +311,7 @@ public class FloorWiseDTO
     public decimal OUTPUT_QTY { get; set; }
     public decimal ALTER_SPOT_QNTY { get; set; }
     public decimal REPLACE_QTY { get; set; }
-    public decimal REJECT_QNTY { get; set; }
+    public decimal REJECT_QTY { get; set; }
     public decimal REJECT_POINT { get; set; }
     public decimal DHU { get; set; }
 }

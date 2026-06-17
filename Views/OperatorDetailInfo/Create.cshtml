@@ -1,0 +1,204 @@
+﻿@model SewingDashboard.Models.TblOperatorDetail
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Operator Detail Entry";
+}
+
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-xl-8 col-lg-9 col-md-12">
+
+
+            <div class="card shadow-lg border-0 rounded-3">
+
+
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        Operator Detail Entry
+                    </h4>
+                </div>
+
+
+
+                <div class="card-body p-4">
+
+
+                    <form asp-controller="OperatorDetailInfo"
+                          asp-action="Create"
+                          method="post">
+
+
+                        @Html.AntiForgeryToken()
+
+
+                        <div class="row g-4">
+
+
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-semibold">
+                                    Production Date
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input asp-for="ProductionDate"
+                                       type="datetime-local"
+                                       class="form-control" />
+
+                            </div>
+
+
+
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-semibold">
+                                    Operator Name
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input asp-for="Name"
+                                       class="form-control"
+                                       placeholder="Enter operator name" />
+
+                            </div>
+
+
+
+
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-semibold">
+                                    Process Name
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input asp-for="ProcessName"
+                                       class="form-control"
+                                       placeholder="Enter process name" />
+
+                            </div>
+
+
+
+
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-semibold">
+                                    Line No
+                                </label>
+
+                                <input asp-for="LineNo"
+                                       class="form-control"
+                                       placeholder="Enter line no" />
+
+                            </div>
+
+
+
+
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-semibold">
+                                    Average Cycle
+                                </label>
+
+                                <input asp-for="AvgCycle"
+                                       class="form-control"
+                                       placeholder="Enter cycle time" />
+
+                            </div>
+
+
+
+
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-semibold">
+                                    Capacity / Hour
+                                </label>
+
+                                <input asp-for="CapacityHr"
+                                       class="form-control"
+                                       placeholder="Enter capacity" />
+
+                            </div>
+
+
+
+
+
+                            <div class="col-12">
+
+                                <label class="form-label fw-semibold">
+                                    Remarks
+                                </label>
+
+
+                                <textarea asp-for="Remark"
+                                          class="form-control"
+                                          rows="3"
+                                          placeholder="Write remarks"></textarea>
+
+
+                            </div>
+
+
+
+                        </div>
+
+
+
+
+
+                        <div class="text-end mt-4">
+
+
+                            <button type="button"
+                                    class="btn btn-outline-secondary px-4 me-2"
+                                    onclick="window.history.back();">
+
+                                Close
+
+                            </button>
+
+
+
+                            <button type="submit"
+                                    class="btn btn-primary px-4">
+
+                                Save
+
+                            </button>
+
+
+                        </div>
+
+
+
+
+                    </form>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>

@@ -47,36 +47,38 @@ namespace SewingDashboard.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCompanyList()
         {
-            var companyList = new List<CompanyDto>();
-
-            var connectionString = _configuration.GetConnectionString("DefaultConnection");
-
-            if (string.IsNullOrWhiteSpace(connectionString))
-                return BadRequest("Connection string not found.");
-
-            await using var con = new SqlConnection(connectionString);
-            await using var cmd = new SqlCommand("COMPANY", con)
+            try
             {
-                CommandType = CommandType.StoredProcedure
-            };
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
 
-            await con.OpenAsync();
-
-            await using var reader = await cmd.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
-            {
-                companyList.Add(new CompanyDto
+                using var con = new SqlConnection(connectionString); ;
+                await using var cmd = new SqlCommand("COMPANY", con)
                 {
-                    Id = reader["ID"] == DBNull.Value
-                            ? 0
-                            : Convert.ToInt32(reader["ID"]),
+                    CommandType = CommandType.StoredProcedure,
+                    CommandTimeout = 180
+                };
 
-                    Name = reader["COMPANY_NAME"]?.ToString()
-                });
+
+                await con.OpenAsync();
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                var companyList = new List<object>();
+
+                while (await reader.ReadAsync())
+                {
+                    companyList.Add(new
+                    {
+                        Id = reader["ID"],
+                        Name = reader["COMPANY_NAME"]
+                    });
+                }
+
+                return Ok(companyList);
             }
-
-            return Ok(companyList);
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.ToString()); // 👈 IMPORTANT
+            }
         }
 
         [HttpGet]

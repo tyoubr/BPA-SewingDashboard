@@ -265,7 +265,6 @@ namespace SewingDashboard.Controllers
                 return BadRequest("Connection string not found.");
 
             var parsedDate = GetSafeDate(date);
-
             await using var con = new SqlConnection(connectionString);
             await using var cmd = new SqlCommand("test_rptSewingDHU", con)
             {
